@@ -6,7 +6,7 @@
 #include "ControladorInfrarrojo.h"
 
 // Definir MODO_DEBUG para activar mensajes seriales
- #define MODO_DEBUG
+#define MODO_DEBUG
 
 ControladorInfrarrojo::ControladorInfrarrojo(uint8_t pin, const String& nombre)
     : pin_sensor(pin),

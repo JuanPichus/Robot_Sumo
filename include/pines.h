@@ -23,8 +23,8 @@
 #define PIN_IR_SUELO_TRASERO 2
 
 //Pines para MPU6050 (giroscopio y acelerometro)
-#define MPU6050_SDA A4
-#define MPU6050_SCL A5
+#define MPU_SDA A4
+#define MPU_SCL A5
 
 //Pines servo de ataque
 #define PIN_SERVO_ATAQUE 13

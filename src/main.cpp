@@ -4,24 +4,22 @@
  */
 
 #include <Arduino.h>
-#include <Wire.h> //mpu
-#include <Adafruit_MPU6050.h> //mpu
-#include <Adafruit_Sensor.h> //mpu
 #include <SoftwareSerial.h> //bluetooth
 
 #include "ControladorMotores.h"
 #include "ControladorUltrasonico.h"
 #include "ControladorInfrarrojo.h"
+#include "ControladorGiroscopio.h"
 
 // Definir MODO_DEBUG para activar mensajes seriales
-// #define MODO_DEBUG
-#define MODO_BT
+#define MODO_DEBUG
+// #define MODO_BT
 #define MODO_MPU
 
 // Constantes de configuracion
 const uint8_t VELOCIDAD_PWM_DER = 250;
 const uint8_t VELOCIDAD_PWM_IZQ = 250;
-const uint8_t VELOCIDAD_GIRO = 255;
+const uint8_t VELOCIDAD_GIRO = 250;
 const unsigned long TIEMPO_ESPERA = 50; // ms
 
 const float POTENCIA_MD = 0.9; //porcentaje de potencia de motor derecho
@@ -37,8 +35,12 @@ ControladorInfrarrojo infrarrojo_central(PIN_IR_CEN, "Centro");
 ControladorInfrarrojo infrarrojo_suelo_delante(PIN_IR_SUELO_DELANTERO, "Suelo Delantero");
 ControladorInfrarrojo infrarrojo_suelo_atras(PIN_IR_SUELO_TRASERO, "Suelo Trasero");
 
+#ifdef MODO_MPU
 Adafruit_MPU6050 mpu;
-SoftwareSerial BT(PIN_RX_BT, PIN_TX_BT); // RX | TX
+ControladorGiroscopio giroscopio(mpu);
+#endif
+
+// SoftwareSerial BT(PIN_RX_BT, PIN_TX_BT); // RX | TX
 
 uint8_t potencia(uint8_t velocidad, float potencia){
     return (uint8_t)((float)velocidad * potencia);
@@ -50,22 +52,6 @@ void setup() {
     Serial.println("Iniciando sistema del carrito de sumo...");
     #endif
 
-    #ifdef MODO_BT
-    BT.begin(9600);
-    BT.println("Iniciando sistema del carrito de sumo con Bluetooth...");
-    #endif
-
-    #ifdef MODO_MPU
-    if (!mpu.begin()) {
-        #ifdef MODO_DEBUG
-        Serial.println("Error al inicializar el MPU6050");
-        #endif
-        while (1) {
-            delay(10);
-        }
-    }
-    #endif
-
     // Inicializar controladores
     controlador_motores.inicializar();
     ultrasonico_izquierdo.inicializar();
@@ -75,6 +61,10 @@ void setup() {
     infrarrojo_central.inicializar();
     infrarrojo_suelo_delante.inicializar();
     infrarrojo_suelo_atras.inicializar();
+
+    #ifdef MODO_MPU
+    giroscopio.inicializar();
+    #endif
 
     #ifdef MODO_DEBUG
     Serial.println("✅ Sistema inicializado correctamente ✅");
@@ -137,5 +127,20 @@ void loop() {
         #endif
         controlador_motores.avanzar(potencia(VELOCIDAD_PWM_DER, POTENCIA_MD) / 4, potencia(VELOCIDAD_PWM_IZQ, POTENCIA_MI) / 4);    
     }
+    #ifdef MODO_MPU
+    if (giroscopio.estaInclinado(4)) {
+        #ifdef MODO_DEBUG
+        Serial.println("⚠️ El carrito está inclinado ⚠️");
+        #endif
+        controlador_motores.retroceder(VELOCIDAD_PWM_DER, VELOCIDAD_PWM_IZQ);
+        delay(200);
+        #ifdef MODO_DEBUG
+        Serial.println("⚔️ Retrocediendo para envestir ⚔️");
+        #endif
+        controlador_motores.avanzar(VELOCIDAD_PWM_DER, VELOCIDAD_PWM_IZQ);
+        delay(200);
+    }
+    #endif
+
     delay(TIEMPO_ESPERA);
 }
