@@ -4,17 +4,21 @@
  */
 
 #include <Arduino.h>
-#include <SoftwareSerial.h> //bluetooth
 
 #include "ControladorMotores.h"
 #include "ControladorUltrasonico.h"
 #include "ControladorInfrarrojo.h"
 #include "ControladorGiroscopio.h"
+#include "Bluetooth.h"
 
 // Definir MODO_DEBUG para activar mensajes seriales
-#define MODO_DEBUG
-// #define MODO_BT
-#define MODO_MPU
+// #define MODO_DEBUG //*
+
+// Definir MODO_MPU para activar el giroscopio
+#define MODO_MPU //*
+
+// Definir MODO_BT para activar mensajes bluetooth
+#define MODO_BT //*
 
 // Constantes de configuracion
 const uint8_t VELOCIDAD_PWM_DER = 250;
@@ -35,12 +39,11 @@ ControladorInfrarrojo infrarrojo_central(PIN_IR_CEN, "Centro");
 ControladorInfrarrojo infrarrojo_suelo_delante(PIN_IR_SUELO_DELANTERO, "Suelo Delantero");
 ControladorInfrarrojo infrarrojo_suelo_atras(PIN_IR_SUELO_TRASERO, "Suelo Trasero");
 
+
 #ifdef MODO_MPU
 Adafruit_MPU6050 mpu;
 ControladorGiroscopio giroscopio(mpu);
 #endif
-
-// SoftwareSerial BT(PIN_RX_BT, PIN_TX_BT); // RX | TX
 
 uint8_t potencia(uint8_t velocidad, float potencia){
     return (uint8_t)((float)velocidad * potencia);
@@ -49,7 +52,12 @@ uint8_t potencia(uint8_t velocidad, float potencia){
 void setup() {
     #ifdef MODO_DEBUG
     Serial.begin(9600);
-    Serial.println("Iniciando sistema del carrito de sumo...");
+    Serial.println("🏁 Iniciando sistema del carrito de sumo... 🏁");
+    #endif
+
+    #ifdef MODO_BT
+    BT_inicializar(38400);
+    BT_println("🏁 Iniciando sistema del carrito de sumo... 🏁");
     #endif
 
     // Inicializar controladores
@@ -61,6 +69,7 @@ void setup() {
     infrarrojo_central.inicializar();
     infrarrojo_suelo_delante.inicializar();
     infrarrojo_suelo_atras.inicializar();
+    
 
     #ifdef MODO_MPU
     giroscopio.inicializar();
@@ -90,7 +99,7 @@ void loop() {
     if (!suelo_atras) {
         // Cerca del borde - retroceder y girar
         #ifdef MODO_DEBUG
-        Serial.println("Cerca del borde - Retrocediendo y girando");
+        Serial.println("⚠️ Cerca del borde ⚠️");
         #endif
         controlador_motores.retroceder(potencia(VELOCIDAD_PWM_DER, POTENCIA_MD), potencia(VELOCIDAD_PWM_IZQ, POTENCIA_MI));
         delay(500);
@@ -123,7 +132,7 @@ void loop() {
     else {
         // Buscar oponente - patron de busqueda
         #ifdef MODO_DEBUG
-        Serial.println("👀 Buscando oponente...");
+        Serial.println("👀 Buscando oponente... 👀");
         #endif
         controlador_motores.avanzar(potencia(VELOCIDAD_PWM_DER, POTENCIA_MD) / 4, potencia(VELOCIDAD_PWM_IZQ, POTENCIA_MI) / 4);    
     }

@@ -4,9 +4,13 @@
  */
 
 #include "ControladorUltrasonico.h"
+#include "Bluetooth.h"
 
 // Definir MODO_DEBUG para activar mensajes seriales
- #define MODO_DEBUG
+//  #define MODO_DEBUG //*
+
+ //Definir MODO_BT para activar mensajes bluetooth
+#define MODO_BT //*
 
 ControladorUltrasonico::ControladorUltrasonico(uint8_t pin_tr, uint8_t pin_ech, const String& nombre)
     : pin_trigger(pin_tr),
@@ -24,12 +28,6 @@ void ControladorUltrasonico::inicializar() {
     Serial.print("✅ Sensor ultrasonico ");
     Serial.print(nombre_sensor);
     Serial.println(" inicializado");
-    #endif
-
-    #ifdef MODO_BT
-    BT.print("✅ Sensor ultrasonico ");
-    BT.print(nombre_sensor);
-    BT.println(" inicializado");
     #endif
 }
 

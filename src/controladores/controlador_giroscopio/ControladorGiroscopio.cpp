@@ -4,9 +4,13 @@
  */
 
 #include "ControladorGiroscopio.h"
+#include "Bluetooth.h"
 
-//Definir MODO_DEBUG para ctivar mensajes seriales
-#define MODO_DEBUG
+//Definir MODO_DEBUG para activar mensajes seriales
+// #define MODO_DEBUG //*
+
+//Definir MODO_BT para activar mensajes bluetooth
+#define MODO_BT //*
 
 ControladorGiroscopio::ControladorGiroscopio(Adafruit_MPU6050 mpu) {
     this->mpu = mpu;
@@ -44,6 +48,12 @@ bool ControladorGiroscopio::estaInclinado(float gradosXY) {
     Serial.print("📐 Angulo XY: "); Serial.print(anguloXY); Serial.println(" grados");
     Serial.print("📐 Angulo XZ: "); Serial.print(anguloXZ); Serial.println(" grados");
     Serial.print("📐 Angulo YZ: "); Serial.print(anguloYZ); Serial.println(" grados");
+    #endif
+
+    #ifdef MODO_BT
+    BT_print("Angulo XY: "); BT_print(anguloXY); BT_println(" grados");
+    BT_print("Angulo XZ: "); BT_print(anguloXZ); BT_println(" grados");
+    BT_print("Angulo YZ: "); BT_print(anguloYZ); BT_println(" grados");
     #endif
 
     if (abs(anguloXY) < gradosXY) {

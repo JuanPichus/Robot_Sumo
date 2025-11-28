@@ -29,6 +29,6 @@
 //Pines servo de ataque
 #define PIN_SERVO_ATAQUE 13
 
-//Pines bluetooth
-#define PIN_RX_BT 0
-#define PIN_TX_BT 1
+//Pines bluetooth (A2=D16, A3=D17)
+#define PIN_RX_BT A2  // Conectar al TX del módulo BT
+#define PIN_TX_BT A3  // Conectar al RX del módulo BT

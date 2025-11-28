@@ -6,7 +6,7 @@
 #include "ControladorMotores.h"
 
 // Definir MODO_DEBUG para activar mensajes seriales
- #define MODO_DEBUG
+//  #define MODO_DEBUG
 
 ControladorMotores::ControladorMotores() 
     : pin_enable_izq(PIN_MOTOR_IZQ_ENABLE),

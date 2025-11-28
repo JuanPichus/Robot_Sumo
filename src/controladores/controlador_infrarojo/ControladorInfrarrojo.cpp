@@ -4,9 +4,13 @@
  */
 
 #include "ControladorInfrarrojo.h"
+#include "Bluetooth.h"
 
 // Definir MODO_DEBUG para activar mensajes seriales
-#define MODO_DEBUG
+// #define MODO_DEBUG //*
+
+//Definir MODO_BT para activar mensajes bluetooth
+#define MODO_BT //*
 
 ControladorInfrarrojo::ControladorInfrarrojo(uint8_t pin, const String& nombre)
     : pin_sensor(pin),
