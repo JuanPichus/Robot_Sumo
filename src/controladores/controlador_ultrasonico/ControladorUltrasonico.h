@@ -18,7 +18,7 @@ private:
     uint8_t pin_trigger;
     uint8_t pin_echo;
     float distancia_maxima_deteccion; // en cm
-    String nombre_sensor;
+    const char* nombre_sensor;
 
     /**
      * @brief Realiza la medicion de distancia
@@ -33,7 +33,7 @@ public:
      * @param pin_ech Pin del echo
      * @param nombre Nombre identificador del sensor
      */
-    ControladorUltrasonico(uint8_t pin_tr, uint8_t pin_ech, const String& nombre);
+    ControladorUltrasonico(uint8_t pin_tr, uint8_t pin_ech, const char* nombre);
 
     /**
      * @brief Inicializa el sensor ultrasonico

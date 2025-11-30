@@ -6,7 +6,7 @@
 #include "ControladorMotores.h"
 
 // Definir MODO_DEBUG para activar mensajes seriales
-//  #define MODO_DEBUG
+//  #define MODO_DEBUG //*
 
 ControladorMotores::ControladorMotores() 
     : pin_enable_izq(PIN_MOTOR_IZQ_ENABLE),
@@ -30,11 +30,11 @@ void ControladorMotores::inicializar() {
     encenderMotores();
 
     #ifdef MODO_DEBUG
-    Serial.println("✅ Motores inicializados");
+    Serial.println(F("[OK] Motores inicializados"));
     #endif
 
     #ifdef MODO_BT
-    BT.println("✅ Motores inicializados");
+    BT.println(F("[OK] Motores inicializados"));
     #endif
 }
 
@@ -44,7 +44,7 @@ void ControladorMotores::encenderMotores() {
     motores_habilitados = true;
 
     #ifdef MODO_DEBUG
-    Serial.println("🟢 Motores encendidos");
+    Serial.println(F("[ON] Motores"));
     #endif
 }
 
@@ -54,32 +54,11 @@ void ControladorMotores::apagarMotores() {
     motores_habilitados = false;
 
     #ifdef MODO_DEBUG
-    Serial.println("🔴 Motores apagados");
+    Serial.println(F("[OFF] Motores"));
     #endif
 }
 
 void ControladorMotores::avanzar(uint8_t velocidad_r, uint8_t velocidad_l) {
-    if (!motores_habilitados) return;
-
-    // Motor izquierdo
-    digitalWrite(pin_in1_izq, HIGH);
-    digitalWrite(pin_in2_izq, LOW);
-    analogWrite(pin_enable_izq, velocidad_l);
-
-    // Motor derecho
-    digitalWrite(pin_in1_der, HIGH);
-    digitalWrite(pin_in2_der, LOW);
-    analogWrite(pin_enable_der, velocidad_r);
-
-    #ifdef MODO_DEBUG
-    Serial.print("⏱ VELOCIDAD M1: ");
-    Serial.println(velocidad_r);
-    Serial.print("⏱ VELOCIDAD M2: ");
-    Serial.println(velocidad_l);
-    #endif
-}
-
-void ControladorMotores::retroceder(uint8_t velocidad_r, uint8_t velocidad_l) {
     if (!motores_habilitados) return;
 
     // Motor izquierdo
@@ -93,9 +72,30 @@ void ControladorMotores::retroceder(uint8_t velocidad_r, uint8_t velocidad_l) {
     analogWrite(pin_enable_der, velocidad_r);
 
     #ifdef MODO_DEBUG
-    Serial.print("🔙 RETROCEDIENDO M1: ");
-    Serial.println(velocidad_r);
-    Serial.print("🔙 RETROCEDIENDO M2: ");
+    Serial.print(F("[MOT] Avanzar M1: "));
+    Serial.print(velocidad_r);
+    Serial.print(F(" M2: "));
+    Serial.println(velocidad_l);
+    #endif
+}
+
+void ControladorMotores::retroceder(uint8_t velocidad_r, uint8_t velocidad_l) {
+    if (!motores_habilitados) return;
+
+    // Motor izquierdo
+    digitalWrite(pin_in1_izq, HIGH);
+    digitalWrite(pin_in2_izq, LOW);
+    analogWrite(pin_enable_izq, velocidad_l);
+
+    // Motor derecho
+    digitalWrite(pin_in1_der, HIGH);
+    digitalWrite(pin_in2_der, LOW);
+    analogWrite(pin_enable_der, velocidad_r);
+
+    #ifdef MODO_DEBUG
+    Serial.print(F("[MOT] Retroceder M1: "));
+    Serial.print(velocidad_r);
+    Serial.print(F(" M2: "));
     Serial.println(velocidad_l);
     #endif
 }
@@ -112,7 +112,7 @@ void ControladorMotores::detener() {
     analogWrite(pin_enable_der, 0);
 
     #ifdef MODO_DEBUG
-    Serial.println("🛑 Motores detenidos");
+    Serial.println(F("[STOP] Motores"));
     #endif
 }
 
@@ -130,13 +130,8 @@ void ControladorMotores::girarIzquierda(uint8_t velocidad) {
     analogWrite(pin_enable_der, velocidad);
 
     #ifdef MODO_DEBUG
-    Serial.print("↩️ Girando a la izquierda a velocidad ");
+    Serial.print(F("[MOT] Girar izq vel: "));
     Serial.println(velocidad);
-    #endif
-
-    #ifdef MODO_BT
-    BT.print("↩️ Girando a la izquierda a velocidad ");
-    BT.println(velocidad);
     #endif
 }
 
@@ -154,12 +149,7 @@ void ControladorMotores::girarDerecha(uint8_t velocidad) {
     analogWrite(pin_enable_der, velocidad);
 
     #ifdef MODO_DEBUG
-    Serial.print("↪️ Girando a la derecha a velocidad ");
+    Serial.print(F("[MOT] Girar der vel: "));
     Serial.println(velocidad);
-    #endif
-
-    #ifdef MODO_BT
-    BT.print("↪️ Girando a la derecha a velocidad ");
-    BT.println(velocidad);
     #endif
 }

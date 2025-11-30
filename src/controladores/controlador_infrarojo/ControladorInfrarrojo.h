@@ -17,7 +17,7 @@ class ControladorInfrarrojo {
 private:
     uint8_t pin_sensor;
     float distancia_maxima_deteccion; // en cm
-    String nombre_sensor;
+    const char* nombre_sensor;
 
 public:
     /**
@@ -25,7 +25,7 @@ public:
      * @param pin Pin del sensor infrarrojo
      * @param nombre Nombre identificador del sensor
      */
-    ControladorInfrarrojo(uint8_t pin, const String& nombre);
+    ControladorInfrarrojo(uint8_t pin, const char* nombre);
 
     /**
      * @brief Inicializa el sensor infrarrojo

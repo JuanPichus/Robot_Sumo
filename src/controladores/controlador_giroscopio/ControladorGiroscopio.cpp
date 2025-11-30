@@ -10,7 +10,7 @@
 // #define MODO_DEBUG //*
 
 //Definir MODO_BT para activar mensajes bluetooth
-#define MODO_BT //*
+// #define MODO_BT //*
 
 ControladorGiroscopio::ControladorGiroscopio(Adafruit_MPU6050 mpu) {
     this->mpu = mpu;
@@ -19,14 +19,14 @@ ControladorGiroscopio::ControladorGiroscopio(Adafruit_MPU6050 mpu) {
 void ControladorGiroscopio::inicializar() {
     if (!mpu.begin()) {
         #ifdef MODO_DEBUG
-        Serial.println("🛑 Giroscopio no encontrado");
+        Serial.println(F("[ERR] MPU no encontrado"));
         #endif
         while(1) {
             delay(10);
         }
     }
     #ifdef MODO_DEBUG
-    Serial.println("✅ Giroscopio encontrado");
+    Serial.println(F("[OK] MPU inicializado"));
     #endif
 
     //inicializar deteccion de movimiento
@@ -41,25 +41,15 @@ bool ControladorGiroscopio::estaInclinado(float gradosXY) {
 
     //Calcular la magnitud de la aceleracion en el plano XY
     float anguloXY = atan2(a.acceleration.y, a.acceleration.x) * 180 / PI;
-    float anguloXZ = atan2(a.acceleration.z, a.acceleration.x) * 180 / PI;
-    float anguloYZ = atan2(a.acceleration.z, a.acceleration.y) * 180 / PI;
+    // float anguloXZ = atan2(a.acceleration.z, a.acceleration.x) * 180 / PI;
+    // float anguloYZ = atan2(a.acceleration.z, a.acceleration.y) * 180 / PI;
 
     #ifdef MODO_DEBUG
-    Serial.print("📐 Angulo XY: "); Serial.print(anguloXY); Serial.println(" grados");
-    Serial.print("📐 Angulo XZ: "); Serial.print(anguloXZ); Serial.println(" grados");
-    Serial.print("📐 Angulo YZ: "); Serial.print(anguloYZ); Serial.println(" grados");
+    Serial.print(F("[MPU] XY: ")); Serial.print(anguloXY); Serial.println(F(" grados"));
+    // Serial.print(F("[MPU] XZ: ")); Serial.print(anguloXZ); Serial.println(F(" grados"));
+    // Serial.print(F("[MPU] YZ: ")); Serial.print(anguloYZ); Serial.println(F(" grados"));
     #endif
 
-    #ifdef MODO_BT
-    BT_print("Angulo XY: "); BT_print(anguloXY); BT_println(" grados");
-    BT_print("Angulo XZ: "); BT_print(anguloXZ); BT_println(" grados");
-    BT_print("Angulo YZ: "); BT_print(anguloYZ); BT_println(" grados");
-    #endif
-
-    if (abs(anguloXY) < gradosXY) {
-        return true;
-    } else {
-        return false;
-    }
+    return (abs(anguloXY) < gradosXY);
 }
 

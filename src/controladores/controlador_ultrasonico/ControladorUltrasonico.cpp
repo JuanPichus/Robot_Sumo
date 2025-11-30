@@ -10,9 +10,9 @@
 //  #define MODO_DEBUG //*
 
  //Definir MODO_BT para activar mensajes bluetooth
-#define MODO_BT //*
+// #define MODO_BT //*
 
-ControladorUltrasonico::ControladorUltrasonico(uint8_t pin_tr, uint8_t pin_ech, const String& nombre)
+ControladorUltrasonico::ControladorUltrasonico(uint8_t pin_tr, uint8_t pin_ech, const char* nombre)
     : pin_trigger(pin_tr),
       pin_echo(pin_ech),
       distancia_maxima_deteccion(30.0),
@@ -25,9 +25,9 @@ void ControladorUltrasonico::inicializar() {
     digitalWrite(pin_trigger, LOW);
 
     #ifdef MODO_DEBUG
-    Serial.print("✅ Sensor ultrasonico ");
+    Serial.print(F("[OK] Sensor US "));
     Serial.print(nombre_sensor);
-    Serial.println(" inicializado");
+    Serial.println(F(" inicializado"));
     #endif
 }
 
@@ -57,21 +57,11 @@ bool ControladorUltrasonico::detectarObjeto() {
 
     #ifdef MODO_DEBUG
     if (detectado) {
-        Serial.print("📡 ");
+        Serial.print(F("[US] "));
         Serial.print(nombre_sensor);
-        Serial.print(": Objeto detectado a ");
+        Serial.print(F(": Objeto a "));
         Serial.print(distancia);
-        Serial.println(" cm");
-    }
-    #endif
-
-    #ifdef MODO_BT
-    if (detectado) {
-        BT.print("📡 ");
-        BT.print(nombre_sensor);
-        BT.print(": Objeto detectado a ");
-        BT.print(distancia);
-        BT.println(" cm");
+        Serial.println(F(" cm"));
     }
     #endif
 
@@ -86,10 +76,10 @@ void ControladorUltrasonico::establecerDistanciaMaxima(float distancia_maxima) {
     distancia_maxima_deteccion = distancia_maxima;
 
     #ifdef MODO_DEBUG
-    Serial.print("❕ Sensor Ultrasonico ");
+    Serial.print(F("[US] "));
     Serial.print(nombre_sensor);
-    Serial.print(": Distancia maxima establecida a ");
+    Serial.print(F(": Dist max = "));
     Serial.print(distancia_maxima);
-    Serial.println(" cm");
+    Serial.println(F(" cm"));
     #endif
 }

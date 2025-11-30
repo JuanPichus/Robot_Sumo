@@ -10,9 +10,9 @@
 // #define MODO_DEBUG //*
 
 //Definir MODO_BT para activar mensajes bluetooth
-#define MODO_BT //*
+// #define MODO_BT //*
 
-ControladorInfrarrojo::ControladorInfrarrojo(uint8_t pin, const String& nombre)
+ControladorInfrarrojo::ControladorInfrarrojo(uint8_t pin, const char* nombre)
     : pin_sensor(pin),
       distancia_maxima_deteccion(15.0),
       nombre_sensor(nombre) {
@@ -22,15 +22,9 @@ void ControladorInfrarrojo::inicializar() {
     pinMode(pin_sensor, INPUT_PULLUP);
 
     #ifdef MODO_DEBUG
-    Serial.print("✅ Sensor IR ");
+    Serial.print(F("[OK] Sensor IR "));
     Serial.print(nombre_sensor);
-    Serial.println(" inicializado");
-    #endif
-
-    #ifdef MODO_BT
-    BT.print("✅ Sensor IR ");
-    BT.print(nombre_sensor);
-    BT.println(" inicializado");
+    Serial.println(F(" inicializado"));
     #endif
 }
 
@@ -39,17 +33,9 @@ bool ControladorInfrarrojo::detectarObjeto() {
 
     #ifdef MODO_DEBUG
     if (objeto_detectado) {
-        Serial.print("📡");
+        Serial.print(F("[IR] "));
         Serial.print(nombre_sensor);
-        Serial.println(": Objeto detectado");
-    }
-    #endif
-
-    #ifdef MODO_BT
-    if (objeto_detectado) {
-        BT.print("📡");
-        BT.print(nombre_sensor);
-        BT.println(": Objeto detectado");
+        Serial.println(F(": Objeto detectado"));
     }
     #endif
 
@@ -60,11 +46,11 @@ void ControladorInfrarrojo::establecerDistanciaMaxima(float distancia_maxima) {
     distancia_maxima_deteccion = distancia_maxima;
 
     #ifdef MODO_DEBUG
-    Serial.print("📏");
+    Serial.print(F("[IR] "));
     Serial.print(nombre_sensor);
-    Serial.print(": Distancia maxima establecida a ");
+    Serial.print(F(": Dist max = "));
     Serial.print(distancia_maxima);
-    Serial.println(" cm");
+    Serial.println(F(" cm"));
     #endif
 }
 

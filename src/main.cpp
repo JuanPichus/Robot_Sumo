@@ -9,25 +9,28 @@
 #include "ControladorUltrasonico.h"
 #include "ControladorInfrarrojo.h"
 #include "ControladorGiroscopio.h"
+#include "ControladorServo.h"
 #include "Bluetooth.h"
 
 // Definir MODO_DEBUG para activar mensajes seriales
 // #define MODO_DEBUG //*
 
+// Definir MODO_BT para activar mensajes bluetooth
+// #define MODO_BT //*
+
 // Definir MODO_MPU para activar el giroscopio
 #define MODO_MPU //*
 
-// Definir MODO_BT para activar mensajes bluetooth
-#define MODO_BT //*
+//Definir MODO_SERVO para activar el servo
+#define MODO_SERVO //*
+
+
 
 // Constantes de configuracion
-const uint8_t VELOCIDAD_PWM_DER = 250;
-const uint8_t VELOCIDAD_PWM_IZQ = 250;
-const uint8_t VELOCIDAD_GIRO = 250;
+const uint8_t VELOCIDAD_PWM_DER = 255;
+const uint8_t VELOCIDAD_PWM_IZQ = 255;
+const uint8_t VELOCIDAD_GIRO = 255;
 const unsigned long TIEMPO_ESPERA = 50; // ms
-
-const float POTENCIA_MD = 0.9; //porcentaje de potencia de motor derecho
-const float POTENCIA_MI = 0.9; //porcentaje de potencia de motor izquierdo
 
 // Instancias de controladores
 ControladorMotores controlador_motores;
@@ -36,8 +39,8 @@ ControladorUltrasonico ultrasonico_derecho(PIN_ULTRASONIC_DER_TRIG, PIN_ULTRASON
 ControladorInfrarrojo infrarrojo_izquierdo(PIN_IR_IZQ, "Izquierdo");
 ControladorInfrarrojo infrarrojo_derecho(PIN_IR_DER, "Derecho");
 ControladorInfrarrojo infrarrojo_central(PIN_IR_CEN, "Centro");
-ControladorInfrarrojo infrarrojo_suelo_delante(PIN_IR_SUELO_DELANTERO, "Suelo Delantero");
-ControladorInfrarrojo infrarrojo_suelo_atras(PIN_IR_SUELO_TRASERO, "Suelo Trasero");
+ControladorInfrarrojo infrarrojo_suelo_derecha(PIN_IR_SUELO_DER, "Suelo_Derecha");
+ControladorInfrarrojo infrarrojo_suelo_izquierda(PIN_IR_SUELO_IZQ, "Suelo_Izquierda");
 
 
 #ifdef MODO_MPU
@@ -45,19 +48,17 @@ Adafruit_MPU6050 mpu;
 ControladorGiroscopio giroscopio(mpu);
 #endif
 
-uint8_t potencia(uint8_t velocidad, float potencia){
-    return (uint8_t)((float)velocidad * potencia);
-}
+#ifdef MODO_SERVO
+Servo servo_motor;
+ControladorServo controlador_servo(PIN_SERVO_ATAQUE, servo_motor, "Servo_Ataque");
+#endif
 
 void setup() {
     #ifdef MODO_DEBUG
     Serial.begin(9600);
-    Serial.println("🏁 Iniciando sistema del carrito de sumo... 🏁");
-    #endif
-
-    #ifdef MODO_BT
-    BT_inicializar(38400);
-    BT_println("🏁 Iniciando sistema del carrito de sumo... 🏁");
+    while(!Serial); // Esperar a que Serial este listo
+    delay(100);
+    Serial.println(F("--- INICIALIZANDO ROBOT SUMO ---"));
     #endif
 
     // Inicializar controladores
@@ -67,16 +68,25 @@ void setup() {
     infrarrojo_izquierdo.inicializar();
     infrarrojo_derecho.inicializar();
     infrarrojo_central.inicializar();
-    infrarrojo_suelo_delante.inicializar();
-    infrarrojo_suelo_atras.inicializar();
-    
+    infrarrojo_suelo_derecha.inicializar();
+    infrarrojo_suelo_izquierda.inicializar();    
 
     #ifdef MODO_MPU
     giroscopio.inicializar();
     #endif
 
+    #ifdef MODO_SERVO
+    controlador_servo.inicializar();
+    controlador_servo.moverA(30); // Posicion inicial
+    #endif
+
+    #ifdef MODO_BT
+    BT_inicializar(9600);
+    BT_println(F("--- INICIANDO ROBOT SUMO ---"));
+    #endif
+
     #ifdef MODO_DEBUG
-    Serial.println("✅ Sistema inicializado correctamente ✅");
+    Serial.println(F("--- INICIALIZACION COMPLETA ---"));
     #endif
 
     // Pequena pausa para estabilizacion
@@ -92,64 +102,99 @@ void loop() {
     bool objeto_frente = infrarrojo_central.detectarObjeto();
     bool objeto_lateral_izq = infrarrojo_izquierdo.detectarObjeto();
     bool objeto_lateral_der = infrarrojo_derecho.detectarObjeto();
-    bool suelo_atras = infrarrojo_suelo_atras.detectarObjeto();
+    bool suelo_derecha = infrarrojo_suelo_derecha.detectarObjeto();
+    bool suelo_izquierda = infrarrojo_suelo_izquierda.detectarObjeto();
     // bool suelo_delante = infrarrojo_suelo_delante.detectarObjeto();
 
-    // Logica de comportamiento del carrito de sumo
-    if (!suelo_atras) {
+    //* Logica de comportamiento del carrito de sumo
+
+    if (!suelo_izquierda) {
         // Cerca del borde - retroceder y girar
         #ifdef MODO_DEBUG
-        Serial.println("⚠️ Cerca del borde ⚠️");
+        Serial.println(F("[!] Cerca del borde"));
         #endif
-        controlador_motores.retroceder(potencia(VELOCIDAD_PWM_DER, POTENCIA_MD), potencia(VELOCIDAD_PWM_IZQ, POTENCIA_MI));
-        delay(500);
+        controlador_motores.retroceder(VELOCIDAD_PWM_DER, VELOCIDAD_PWM_IZQ);
+        delay(1500);
         controlador_motores.girarDerecha(VELOCIDAD_PWM_DER);
-        delay(750);
+        delay(1500);
     }
-    else if (objeto_frente_izq || objeto_frente_der || objeto_frente) {
+    else if (!suelo_derecha) {
+        // Cerca del borde - retroceder y girar
+        #ifdef MODO_DEBUG
+        Serial.println(F("[!] Cerca del borde"));
+        #endif
+        controlador_motores.retroceder(VELOCIDAD_PWM_DER, VELOCIDAD_PWM_IZQ);
+        delay(1500);
+        controlador_motores.girarIzquierda(VELOCIDAD_PWM_IZQ);
+        delay(1500);
+    }
+    #ifdef MODO_MPU
+    else if (giroscopio.estaInclinado(150)) {
+        #ifdef MODO_DEBUG
+        Serial.println(F("[!] Carrito inclinado"));
+        #endif
+        controlador_motores.retroceder(VELOCIDAD_PWM_DER, VELOCIDAD_PWM_IZQ);
+        delay(700);
+        #ifdef MODO_DEBUG
+        Serial.println(F("[!!!] Retrocediendo para envestir"));
+        #endif
+        controlador_motores.avanzar(VELOCIDAD_PWM_DER, VELOCIDAD_PWM_IZQ);
+        delay(400);
+    }
+    #endif
+    else if (objeto_frente) {
         // Objeto al frente - atacar
         #ifdef MODO_DEBUG
-        Serial.println("⚔️ Objeto detectado al frente ⚔️");
+        Serial.println(F("[!!!] Objeto al frente - atacando"));
         #endif
-        controlador_motores.avanzar(potencia(VELOCIDAD_PWM_DER, POTENCIA_MD), potencia(VELOCIDAD_PWM_IZQ, POTENCIA_MI));
+        controlador_motores.avanzar(VELOCIDAD_PWM_DER, VELOCIDAD_PWM_IZQ);
     }
-    else if (objeto_lateral_izq) {
-        // Objeto a la izquierda - girar derecha
+    else if (objeto_frente_izq) {
+        // Objeto al frente - atacar
         #ifdef MODO_DEBUG
-        Serial.println("⚠️ Objeto detectado a la izquierda ⚠️");
+        Serial.println(F("[!!!] Objeto al frente - atacando"));
         #endif
         controlador_motores.girarIzquierda(VELOCIDAD_GIRO);
-        //controlador_motores.retroceder(VELOCIDAD_NORMAL / 4);
+        delay(50);
+        controlador_motores.avanzar(VELOCIDAD_PWM_DER, VELOCIDAD_PWM_IZQ);
     }
-    else if (objeto_lateral_der) {
-        // Objeto a la derecha - girar izquierda
+    else if (objeto_frente_der) {
+        // Objeto al frente a la derecha - girar derecha
         #ifdef MODO_DEBUG
-        Serial.println("⚠️ Objeto detectado a la derecha ⚠️");
+        Serial.println(F("[!] Objeto al frente a la derecha"));
         #endif
         controlador_motores.girarDerecha(VELOCIDAD_GIRO);
-        //controlador_motores.retroceder(VELOCIDAD_NORMAL / 4);
+        delay(50);
+        controlador_motores.avanzar(VELOCIDAD_PWM_DER, VELOCIDAD_PWM_IZQ);
+    }
+    else if (objeto_lateral_izq) {
+        // Objeto a la izquierda - girar izquierda
+        #ifdef MODO_DEBUG
+        Serial.println(F("[!] Objeto a la izquierda"));
+        #endif
+        controlador_motores.girarIzquierda(VELOCIDAD_GIRO);
+    }
+    else if (objeto_lateral_der) {
+        // Objeto a la derecha - girar derecha
+        #ifdef MODO_DEBUG
+        Serial.println(F("[!] Objeto a la derecha"));
+        #endif
+        controlador_motores.girarDerecha(VELOCIDAD_GIRO);
     }
     else {
         // Buscar oponente - patron de busqueda
         #ifdef MODO_DEBUG
-        Serial.println("👀 Buscando oponente... 👀");
+        Serial.println(F("[?] Buscando oponente..."));
         #endif
-        controlador_motores.avanzar(potencia(VELOCIDAD_PWM_DER, POTENCIA_MD) / 4, potencia(VELOCIDAD_PWM_IZQ, POTENCIA_MI) / 4);    
-    }
-    #ifdef MODO_MPU
-    if (giroscopio.estaInclinado(4)) {
-        #ifdef MODO_DEBUG
-        Serial.println("⚠️ El carrito está inclinado ⚠️");
-        #endif
-        controlador_motores.retroceder(VELOCIDAD_PWM_DER, VELOCIDAD_PWM_IZQ);
-        delay(200);
-        #ifdef MODO_DEBUG
-        Serial.println("⚔️ Retrocediendo para envestir ⚔️");
-        #endif
-        controlador_motores.avanzar(VELOCIDAD_PWM_DER, VELOCIDAD_PWM_IZQ);
-        delay(200);
-    }
-    #endif
 
+        #ifdef MODO_SERVO
+        controlador_servo.atacar();
+        #endif
+
+        // controlador_motores.avanzar(VELOCIDAD_PWM_DER / 3, VELOCIDAD_PWM_IZQ / 3); //busqueda lineal
+        controlador_motores.girarIzquierda(VELOCIDAD_GIRO / 2); //busqueda en circulo 
+        delay(100);
+    }
+    
     delay(TIEMPO_ESPERA);
 }
