@@ -65,6 +65,16 @@ bool ControladorUltrasonico::detectarObjeto() {
     }
     #endif
 
+    #ifdef MODO_BT
+    if (detectado) {
+        BT.print(F("[US] "));
+        BT.print(nombre_sensor);
+        BT.print(F(": Objeto a "));
+        BT.print(distancia);
+        BT.println(F(" cm"));
+    }
+    #endif
+
     return detectado;
 }
 

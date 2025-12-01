@@ -50,6 +50,10 @@ bool ControladorGiroscopio::estaInclinado(float gradosXY) {
     // Serial.print(F("[MPU] YZ: ")); Serial.print(anguloYZ); Serial.println(F(" grados"));
     #endif
 
+    #ifdef MODO_BT
+    BT.print(F("[MPU] XY: ")); BT.print(anguloXY); BT.println(F(" grados"));
+    #endif
+
     return (abs(anguloXY) < gradosXY);
 }
 

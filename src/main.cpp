@@ -19,10 +19,10 @@
 // #define MODO_BT //*
 
 // Definir MODO_MPU para activar el giroscopio
-#define MODO_MPU //*
+// #define MODO_MPU //*
 
 //Definir MODO_SERVO para activar el servo
-#define MODO_SERVO //*
+// #define MODO_SERVO //*
 
 
 
@@ -104,28 +104,27 @@ void loop() {
     bool objeto_lateral_der = infrarrojo_derecho.detectarObjeto();
     bool suelo_derecha = infrarrojo_suelo_derecha.detectarObjeto();
     bool suelo_izquierda = infrarrojo_suelo_izquierda.detectarObjeto();
-    // bool suelo_delante = infrarrojo_suelo_delante.detectarObjeto();
 
     //* Logica de comportamiento del carrito de sumo
 
-    if (!suelo_izquierda) {
+    if (!suelo_derecha) {
         // Cerca del borde - retroceder y girar
         #ifdef MODO_DEBUG
-        Serial.println(F("[!] Cerca del borde"));
+        Serial.println(F("[!] Cerca del borde derecho"));
         #endif
         controlador_motores.retroceder(VELOCIDAD_PWM_DER, VELOCIDAD_PWM_IZQ);
         delay(1500);
-        controlador_motores.girarDerecha(VELOCIDAD_PWM_DER);
+        controlador_motores.girarIzquierda(VELOCIDAD_PWM_DER);
         delay(1500);
     }
-    else if (!suelo_derecha) {
+    else if (!suelo_izquierda) {
         // Cerca del borde - retroceder y girar
         #ifdef MODO_DEBUG
-        Serial.println(F("[!] Cerca del borde"));
+        Serial.println(F("[!] Cerca del borde izquierdo"));
         #endif
         controlador_motores.retroceder(VELOCIDAD_PWM_DER, VELOCIDAD_PWM_IZQ);
         delay(1500);
-        controlador_motores.girarIzquierda(VELOCIDAD_PWM_IZQ);
+        controlador_motores.girarDerecha(VELOCIDAD_PWM_IZQ);
         delay(1500);
     }
     #ifdef MODO_MPU
@@ -152,7 +151,7 @@ void loop() {
     else if (objeto_frente_izq) {
         // Objeto al frente - atacar
         #ifdef MODO_DEBUG
-        Serial.println(F("[!!!] Objeto al frente - atacando"));
+        Serial.println(F("[!!!] Objeto al frente a la izquierda - atacando"));
         #endif
         controlador_motores.girarIzquierda(VELOCIDAD_GIRO);
         delay(50);
@@ -161,7 +160,7 @@ void loop() {
     else if (objeto_frente_der) {
         // Objeto al frente a la derecha - girar derecha
         #ifdef MODO_DEBUG
-        Serial.println(F("[!] Objeto al frente a la derecha"));
+        Serial.println(F("[!!!] Objeto al frente a la derecha - atacando"));
         #endif
         controlador_motores.girarDerecha(VELOCIDAD_GIRO);
         delay(50);

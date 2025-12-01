@@ -39,6 +39,14 @@ bool ControladorInfrarrojo::detectarObjeto() {
     }
     #endif
 
+    #ifdef MODO_BT
+    if (objeto_detectado) {
+        BT.print(F("[IR] "));
+        BT.print(nombre_sensor);
+        BT.println(F(": Objeto detectado"));
+    }
+    #endif
+
     return objeto_detectado;
 }
 
