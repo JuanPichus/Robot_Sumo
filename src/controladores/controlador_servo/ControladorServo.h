@@ -24,9 +24,7 @@ public:
      * @brief Constructor de la clase ControladorServo
      * @param pin Pin al que esta conectado el servo
      */
-    ControladorServo(uint8_t pin, Servo servo, const char* nombre = "Servo")
-        : pin_servo(pin), servo_motor(servo), nombre_servo(nombre) {
-    }
+    ControladorServo(uint8_t pin, Servo servo, const char* nombre);
 
     /**
      * @brief Inicializa el servo motor

@@ -10,7 +10,7 @@
 //  #define MODO_DEBUG //*
 
  //Definir MODO_BT para activar mensajes bluetooth
-// #define MODO_BT //*
+#define MODO_BT //*
 
 ControladorUltrasonico::ControladorUltrasonico(uint8_t pin_tr, uint8_t pin_ech, const char* nombre)
     : pin_trigger(pin_tr),

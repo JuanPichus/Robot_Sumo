@@ -16,10 +16,10 @@
 // #define MODO_DEBUG //*
 
 // Definir MODO_BT para activar mensajes bluetooth
-// #define MODO_BT //*
+#define MODO_BT //*
 
 // Definir MODO_MPU para activar el giroscopio
-// #define MODO_MPU //*
+#define MODO_MPU //*
 
 //Definir MODO_SERVO para activar el servo
 // #define MODO_SERVO //*
@@ -69,7 +69,7 @@ void setup() {
     infrarrojo_derecho.inicializar();
     infrarrojo_central.inicializar();
     infrarrojo_suelo_derecha.inicializar();
-    infrarrojo_suelo_izquierda.inicializar();    
+    infrarrojo_suelo_izquierda.inicializar();
 
     #ifdef MODO_MPU
     giroscopio.inicializar();
@@ -112,10 +112,11 @@ void loop() {
         #ifdef MODO_DEBUG
         Serial.println(F("[!] Cerca del borde derecho"));
         #endif
+
         controlador_motores.retroceder(VELOCIDAD_PWM_DER, VELOCIDAD_PWM_IZQ);
-        delay(1500);
+        delay(1000);
         controlador_motores.girarIzquierda(VELOCIDAD_PWM_DER);
-        delay(1500);
+        delay(1000);
     }
     else if (!suelo_izquierda) {
         // Cerca del borde - retroceder y girar
@@ -123,12 +124,12 @@ void loop() {
         Serial.println(F("[!] Cerca del borde izquierdo"));
         #endif
         controlador_motores.retroceder(VELOCIDAD_PWM_DER, VELOCIDAD_PWM_IZQ);
-        delay(1500);
+        delay(1000);
         controlador_motores.girarDerecha(VELOCIDAD_PWM_IZQ);
-        delay(1500);
+        delay(1000);
     }
     #ifdef MODO_MPU
-    else if (giroscopio.estaInclinado(150)) {
+    else if (giroscopio.estaInclinado(-7)) {
         #ifdef MODO_DEBUG
         Serial.println(F("[!] Carrito inclinado"));
         #endif
@@ -147,6 +148,11 @@ void loop() {
         Serial.println(F("[!!!] Objeto al frente - atacando"));
         #endif
         controlador_motores.avanzar(VELOCIDAD_PWM_DER, VELOCIDAD_PWM_IZQ);
+
+        #ifdef MODO_SERVO
+        Serial.println(F("Atacando con servo"));
+        controlador_servo.atacar();
+        #endif
     }
     else if (objeto_frente_izq) {
         // Objeto al frente - atacar
@@ -186,11 +192,12 @@ void loop() {
         Serial.println(F("[?] Buscando oponente..."));
         #endif
 
-        #ifdef MODO_SERVO
-        controlador_servo.atacar();
-        #endif
+        // #ifdef MODO_SERVO
+        // Serial.print(F("Atacando con Servo"));
+        // controlador_servo.atacar();
+        // #endif
 
-        // controlador_motores.avanzar(VELOCIDAD_PWM_DER / 3, VELOCIDAD_PWM_IZQ / 3); //busqueda lineal
+        // controlador_motores.avanzar(VELOCIDAD_PWM_DER / 2, VELOCIDAD_PWM_IZQ / 2); //busqueda lineal
         controlador_motores.girarIzquierda(VELOCIDAD_GIRO / 2); //busqueda en circulo 
         delay(100);
     }

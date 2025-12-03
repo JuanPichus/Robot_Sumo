@@ -19,7 +19,7 @@
 #define PIN_IR_DER 12
 
 //Pines para detectar perímetro (dojo)
-#define PIN_IR_SUELO_IZQ 3 //! cambiar a 13
+#define PIN_IR_SUELO_IZQ 13
 #define PIN_IR_SUELO_DER 2
 
 //Pines para MPU6050 (giroscopio y acelerometro)
@@ -27,7 +27,7 @@
 #define MPU_SCL A5
 
 //Pines servo de ataque
-#define PIN_SERVO_ATAQUE 13 //! cambiar a 3 (ya que necesito PWM)
+#define PIN_SERVO_ATAQUE 3
 
 //Pines bluetooth (A2=D16, A3=D17)
 #define PIN_RX_BT A2  // Conectar al TX del módulo BT
