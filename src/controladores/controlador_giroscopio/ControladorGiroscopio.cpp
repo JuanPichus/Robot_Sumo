@@ -10,7 +10,7 @@
 // #define MODO_DEBUG //*
 
 //Definir MODO_BT para activar mensajes bluetooth
-#define MODO_BT //*
+// #define MODO_BT //*
 
 ControladorGiroscopio::ControladorGiroscopio(Adafruit_MPU6050 mpu) {
     this->mpu = mpu;

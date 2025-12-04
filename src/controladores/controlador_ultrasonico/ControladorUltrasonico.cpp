@@ -10,7 +10,7 @@
 //  #define MODO_DEBUG //*
 
  //Definir MODO_BT para activar mensajes bluetooth
-#define MODO_BT //*
+// #define MODO_BT //*
 
 ControladorUltrasonico::ControladorUltrasonico(uint8_t pin_tr, uint8_t pin_ech, const char* nombre)
     : pin_trigger(pin_tr),
@@ -53,7 +53,7 @@ float ControladorUltrasonico::medirDistancia() {
 
 bool ControladorUltrasonico::detectarObjeto() {
     float distancia = obtenerDistancia();
-    bool detectado = (distancia > 5 && distancia <= distancia_maxima_deteccion);
+    bool detectado = (distancia > 4 && distancia <= distancia_maxima_deteccion);
 
     #ifdef MODO_DEBUG
     if (detectado) {
